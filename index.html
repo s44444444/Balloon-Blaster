@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>BalloonBlaster</title>
+<title>Balloon Blaster</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -44,6 +45,7 @@
     box-shadow: 0 0 25px rgba(255, 100, 100, 0.5);
     cursor: crosshair;
     background: #000;
+    isolation: isolate;
   }
 
   @media (max-width: 480px) {
@@ -56,6 +58,7 @@
     }
   }
 
+  /* Moving background */
   #bg {
     position: absolute;
     top: 0;
@@ -68,6 +71,8 @@
     animation: moveBg 25s linear infinite;
     z-index: 1;
     filter: brightness(0.92) contrast(0.95);
+    will-change: transform;
+    pointer-events: none;
   }
 
   #bg::after {
@@ -82,18 +87,29 @@
   }
 
   @keyframes moveBg {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0%   { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
   }
 
   @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
-    20%, 40%, 60%, 80% { transform: translateX(8px); }
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    10%, 30%, 50%, 70%, 90% { transform: translate3d(-8px, 0, 0); }
+    20%, 40%, 60%, 80% { transform: translate3d(8px, 0, 0); }
   }
 
   .shake {
     animation: shake 0.8s linear 6;
+  }
+
+  /* Canvas */
+  #game-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+    image-rendering: pixelated;
   }
 
   #score {
@@ -114,9 +130,30 @@
        0    3px 0 #000,
       -3px  0   0 #000,
        3px  0   0 #000;
+    pointer-events: none;
   }
+  #best-score {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: clamp(13px, 4vw, 17px);
+  font-weight: 900;
+  color: #ffeb3b;
+  z-index: 20;
+  letter-spacing: 1px;
+  text-shadow:
+    -3px -3px 0 #000,
+     3px -3px 0 #000,
+    -3px  3px 0 #000,
+     3px  3px 0 #000,
+     0   -3px 0 #000,
+     0    3px 0 #000,
+    -3px  0   0 #000,
+     3px  0   0 #000;
+  pointer-events: none;
+}
 
-  /* Centered game over message */
+  /* Game over */
   #message {
     position: absolute;
     top: 50%;
@@ -145,7 +182,6 @@
     image-rendering: pixelated;
   }
 
-  /* Game over red text with white border */
   .game-over-title {
     font-size: 1.2em;
     color: #ff1744;
@@ -161,7 +197,6 @@
        2px  0   0 #fff;
   }
 
-  /* Other game-over text with white fill and black border */
   .game-over-info {
     color: #ffffff;
     margin: 3px 0;
@@ -219,6 +254,7 @@
     background: #2196f3;
   }
 
+  /* Start screen */
   #start-screen {
     position: absolute;
     inset: 0;
@@ -232,7 +268,6 @@
     padding: 16px;
   }
 
-  /* Multi-colored balloon styled PopIt logo */
   .popit-logo {
     display: flex;
     font-size: clamp(22px, 7vw, 32px);
@@ -247,17 +282,18 @@
   .popit-logo span {
     display: inline-block;
     animation: balloonFloat 2s ease-in-out infinite alternate;
+    will-change: transform;
   }
 
-  .popit-logo span:nth-child(1) { color: #ff5252; animation-delay: 0.0s; } /* P */
-  .popit-logo span:nth-child(2) { color: #ff4081; animation-delay: 0.2s; } /* o */
-  .popit-logo span:nth-child(3) { color: #e040fb; animation-delay: 0.4s; } /* p */
-  .popit-logo span:nth-child(4) { color: #00e676; animation-delay: 0.6s; } /* I */
-  .popit-logo span:nth-child(5) { color: #ffeb3b; animation-delay: 0.8s; } /* t */
+  .popit-logo span:nth-child(1) { color: #ff5252; animation-delay: 0.0s; }
+  .popit-logo span:nth-child(2) { color: #ff4081; animation-delay: 0.2s; }
+  .popit-logo span:nth-child(3) { color: #e040fb; animation-delay: 0.4s; }
+  .popit-logo span:nth-child(4) { color: #00e676; animation-delay: 0.6s; }
+  .popit-logo span:nth-child(5) { color: #ffeb3b; animation-delay: 0.8s; }
 
   @keyframes balloonFloat {
-    0%   { transform: translateY(0px) scale(1); }
-    100% { transform: translateY(-8px) scale(1.08); }
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(0, -8px, 0) scale(1.08); }
   }
 
   #name-input {
@@ -296,7 +332,7 @@
 
   #start-btn:hover,
   #start-btn:active {
-    transform: translate(3px, 3px);
+    transform: translate3d(3px, 3px, 0);
     box-shadow: 3px 3px 0 #000;
     background: #ff4081;
   }
@@ -305,47 +341,27 @@
     position: absolute;
     bottom: 16px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
     width: 95px;
     height: 95px;
     z-index: 10;
     pointer-events: none;
     image-rendering: pixelated;
   }
-
-  .balloon {
-    position: absolute;
-    width: 58px;
-    height: 58px;
-    z-index: 5;
-    pointer-events: none;
-    image-rendering: pixelated;
-    transition: transform 0.15s ease-out, opacity 0.25s ease-out;
-  }
-
-  .balloon.pop {
-    transform: scale(1.8);
-    opacity: 0;
-  }
-
-  .bullet {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    background: radial-gradient(circle, #fff 15%, #ffeb3b 55%, #ff9800 100%);
-    border-radius: 50%;
-    box-shadow: 0 0 10px #ff0, 0 0 18px #ff9800;
-    z-index: 8;
-    pointer-events: none;
-  }
 </style>
+
 </head>
+
 <body>
 
 <div id="game-container">
+
   <div id="bg"></div>
 
+<canvas id="game-canvas"></canvas>
+
   <div id="score" style="display:none;">Score: 0</div>
+  <div id="best-score">Best: 0</div>
 
   <div id="message"></div>
 
@@ -353,378 +369,1239 @@
     <h1 class="popit-logo">
       <span>P</span><span>o</span><span>p</span><span>I</span><span>t</span>
     </h1>
-    <input type="text" id="name-input" placeholder="Enter your name" maxlength="12" autocomplete="off">
-    <button id="start-btn">START</button>
+
+```
+<input
+  type="text"
+  id="name-input"
+  placeholder="Enter your name"
+  maxlength="12"
+  autocomplete="off"
+>
+
+<button id="start-btn">START</button>
+```
+
   </div>
 
-  <img id="shooter" src="images/shooter.png" alt="Shooter" style="display:none;">
+<img
+id="shooter"
+src="images/shooter.png"
+alt="Shooter"
+style="display:none;"
+
+>
+
 </div>
 
-<audio id="burst-sound" src="sounds/pop_sound1.mp3" preload="auto"></audio>
-<audio id="gameover-sound" src="sounds/game_over.mp3" preload="auto"></audio>
+<audio id="burst-sound" src="sounds/pop_sound1.mp3" preload="auto"></audio> <audio id="gameover-sound" src="sounds/game_over.mp3" preload="auto"></audio>
 
 <script>
-  const container = document.getElementById('game-container');
-  const scoreEl = document.getElementById('score');
-  const messageEl = document.getElementById('message');
-  const shooter = document.getElementById('shooter');
-  const startScreen = document.getElementById('start-screen');
-  const startBtn = document.getElementById('start-btn');
-  const nameInput = document.getElementById('name-input');
+/* =========================================================
+   POPIT - MOBILE OPTIMIZED VERSION
+   Same gameplay / assets / visual style
+   ========================================================= */
 
-  const burstSound = document.getElementById('burst-sound');
-  const gameoverSound = document.getElementById('gameover-sound');
+const container = document.getElementById('game-container');
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d', { alpha: true });
 
-  const balloonImages = [
-    'images/pink_ballon.png',
-    'images/skyblue_ballon.png',
-    'images/blue_ballon.png',
-    'images/red_ballon.png',
-    'images/green_ballon.png',
-    'images/yellow_ballon.png'
-  ];
+const scoreEl = document.getElementById('score');
+const bestScoreEl = document.getElementById('best-score');
+const messageEl = document.getElementById('message');
+const shooter = document.getElementById('shooter');
+const startScreen = document.getElementById('start-screen');
+const startBtn = document.getElementById('start-btn');
+const nameInput = document.getElementById('name-input');
 
-  let score = 0;
-  let bestScore = parseInt(localStorage.getItem('balloonBest') || '0', 10);
-  let playerName = localStorage.getItem('balloonName') || '';
-  let gameOver = false;
-  let gameStarted = false;
-  let balloons = [];
-  let bullets = [];
-  let animationId = null;
-  let spawnTimer = null;
-  let isNewBest = false;
+const burstSound = document.getElementById('burst-sound');
+const gameoverSound = document.getElementById('gameover-sound');
 
-  let GAME_WIDTH = 360;
-  let GAME_HEIGHT = 640;
+/* ---------------------------------------------------------
+   Assets
+   --------------------------------------------------------- */
 
-  if (playerName) nameInput.value = playerName;
+const balloonImages = [
+  'images/pink_ballon.png',
+  'images/skyblue_ballon.png',
+  'images/blue_ballon.png',
+  'images/red_ballon.png',
+  'images/green_ballon.png',
+  'images/yellow_ballon.png'
+];
 
-  function updateSize() {
-    const rect = container.getBoundingClientRect();
-    GAME_WIDTH = rect.width;
-    GAME_HEIGHT = rect.height;
+/* Preload images once.
+   This prevents the browser from repeatedly decoding them. */
+const loadedBalloonImages = balloonImages.map(src => {
+  const img = new Image();
+  img.src = src;
+  return img;
+});
+
+/* ---------------------------------------------------------
+   Game state
+   --------------------------------------------------------- */
+
+let score = 0;
+
+let bestScore = parseInt(
+  localStorage.getItem('balloonBest') || '0',
+  10
+  
+);
+bestScoreEl.textContent = 'Best: ' + bestScore;
+
+let playerName =
+  localStorage.getItem('balloonName') || '';
+
+let gameOver = false;
+let gameStarted = false;
+let gamePaused = false;
+
+let balloons = [];
+let bullets = [];
+
+let animationId = null;
+let spawnTimer = null;
+
+let isNewBest = false;
+
+let GAME_WIDTH = 360;
+let GAME_HEIGHT = 640;
+
+/* Device pixel ratio is intentionally capped.
+   A 3x/4x phone screen does NOT need a 3x canvas
+   for this pixel-art game. */
+let DPR = 1;
+
+/* Used for delta-time movement */
+let lastTime = 0;
+
+/* ---------------------------------------------------------
+   Size / Canvas
+   --------------------------------------------------------- */
+
+function updateSize() {
+
+  const rect = container.getBoundingClientRect();
+
+  GAME_WIDTH = rect.width;
+  GAME_HEIGHT = rect.height;
+
+  /* Cap DPR to reduce GPU memory and rendering work */
+  DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+
+  canvas.width = Math.round(GAME_WIDTH * DPR);
+  canvas.height = Math.round(GAME_HEIGHT * DPR);
+
+  canvas.style.width = GAME_WIDTH + 'px';
+  canvas.style.height = GAME_HEIGHT + 'px';
+
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+
+/* ---------------------------------------------------------
+   Sound
+   --------------------------------------------------------- */
+
+function playSound(sound) {
+
+  sound.currentTime = 0;
+
+  const promise = sound.play();
+
+  if (promise) {
+    promise.catch(() => {});
+  }
+}
+
+/* ---------------------------------------------------------
+   Start game
+   --------------------------------------------------------- */
+
+function startGame() {
+document.getElementById('bg').style.animationPlayState = 'running';
+  const name =
+    nameInput.value.trim() || 'Player';
+
+  playerName = name;
+
+  localStorage.setItem(
+    'balloonName',
+    playerName
+  );
+
+  updateSize();
+
+  gameStarted = true;
+  gameOver = false;
+  gamePaused = false;
+  isNewBest = false;
+
+  container.classList.remove('shake');
+
+  startScreen.style.display = 'none';
+
+  scoreEl.style.display = 'block';
+
+  shooter.style.display = 'block';
+
+  messageEl.style.display = 'none';
+
+  /* Clear old game objects */
+  balloons.length = 0;
+  bullets.length = 0;
+
+  score = 0;
+
+  scoreEl.textContent = 'Score: 0';
+
+  /* Stop old animation */
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
   }
 
-  function playSound(sound) {
-    sound.currentTime = 0;
-    sound.play().catch(() => {});
-  }
-
-  function startGame() {
-    const name = nameInput.value.trim() || 'Player';
-    playerName = name;
-    localStorage.setItem('balloonName', playerName);
-
-    updateSize();
-    gameStarted = true;
-    gameOver = false;
-    isNewBest = false;
-
-    container.classList.remove('shake');
-
-    startScreen.style.display = 'none';
-    scoreEl.style.display = 'block';
-    shooter.style.display = 'block';
-    messageEl.style.display = 'none';
-
-    balloons.forEach(b => b.el.remove());
-    bullets.forEach(b => b.el.remove());
-    balloons = [];
-    bullets = [];
-    score = 0;
-    scoreEl.textContent = 'Score: 0';
-
-    if (animationId) cancelAnimationFrame(animationId);
-    if (spawnTimer) clearInterval(spawnTimer);
-
-    spawnTimer = setInterval(spawnBalloon, 1100);
-    spawnBalloon();
-    gameLoop();
-  }
-
-  function spawnBalloon() {
-    if (gameOver || !gameStarted) return;
-
-    const img = document.createElement('img');
-    img.src = balloonImages[Math.floor(Math.random() * balloonImages.length)];
-    img.className = 'balloon';
-
-    const size = 52 + Math.random() * 22;
-    img.style.width = size + 'px';
-    img.style.height = size + 'px';
-
-    const y = 40 + Math.random() * (GAME_HEIGHT * 0.32);
-    img.style.left = '-70px';
-    img.style.top = y + 'px';
-
-    container.appendChild(img);
-
-    balloons.push({
-      el: img,
-      x: -70,
-      baseY: y,
-      speed: 1.4 + Math.random() * 2.6,
-      amplitude: 15 + Math.random() * 15,
-      frequency: 0.03 + Math.random() * 0.02,
-      size: size,
-      popped: false
-    });
-  }
-
-  function shoot(e) {
-    if (!gameStarted || gameOver) return;
-
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-    const rect = container.getBoundingClientRect();
-    const clickX = clientX - rect.left;
-    const clickY = clientY - rect.top;
-
-    const startX = GAME_WIDTH / 2;
-    const startY = GAME_HEIGHT - 60;
-
-    const dx = clickX - startX;
-    const dy = clickY - startY;
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-
-    const speed = 13;
-    const vx = (dx / dist) * speed;
-    const vy = (dy / dist) * speed;
-
-    const bulletEl = document.createElement('div');
-    bulletEl.className = 'bullet';
-    bulletEl.style.left = startX + 'px';
-    bulletEl.style.top = startY + 'px';
-    container.appendChild(bulletEl);
-
-    bullets.push({
-      el: bulletEl,
-      x: startX,
-      y: startY,
-      vx: vx,
-      vy: vy,
-      hit: false
-    });
-  }
-
-  function gameLoop() {
-    if (gameOver || !gameStarted) return;
-
-    for (let i = balloons.length - 1; i >= 0; i--) {
-      const b = balloons[i];
-      if (b.popped) continue;
-
-      b.x += b.speed;
-      b.y = b.baseY + Math.sin(b.x * b.frequency) * b.amplitude;
-
-      b.el.style.left = b.x + 'px';
-      b.el.style.top = b.y + 'px';
-
-      if (b.x > GAME_WIDTH + 20) {
-        b.el.remove();
-        balloons.splice(i, 1);
-        endGame();
-        return;
-      }
-    }
-
-    for (let i = bullets.length - 1; i >= 0; i--) {
-      const bullet = bullets[i];
-      if (bullet.hit) continue;
-
-      bullet.x += bullet.vx;
-      bullet.y += bullet.vy;
-      bullet.el.style.left = bullet.x + 'px';
-      bullet.el.style.top = bullet.y + 'px';
-
-      let hitSomething = false;
-
-      for (let j = balloons.length - 1; j >= 0; j--) {
-        const b = balloons[j];
-        if (b.popped) continue;
-
-        const bx = b.x + b.size / 2;
-        const by = b.y + b.size / 2;
-        const dist = Math.hypot(bullet.x - bx, bullet.y - by);
-
-        if (dist < b.size / 2 + 10) {
-          b.popped = true;
-          b.el.classList.add('pop');
-          setTimeout(() => b.el.remove(), 280);
-
-          balloons.splice(j, 1);
-          hitSomething = true;
-
-          score++;
-          scoreEl.textContent = 'Score: ' + score;
-
-          playSound(burstSound);
-
-          bullet.hit = true;
-          bullet.el.remove();
-          bullets.splice(i, 1);
-          break;
-        }
-      }
-
-      if (!hitSomething && (
-          bullet.x < -30 || bullet.x > GAME_WIDTH + 30 ||
-          bullet.y < -30 || bullet.y > GAME_HEIGHT + 30
-      )) {
-        bullet.el.remove();
-        bullets.splice(i, 1);
-        endGame();
-        return;
-      }
-    }
-
-    animationId = requestAnimationFrame(gameLoop);
-  }
-
-  function endGame() {
-    if (gameOver) return;
-    gameOver = true;
+  /* Stop old spawn timer */
+  if (spawnTimer !== null) {
     clearInterval(spawnTimer);
+    spawnTimer = null;
+  }
 
-    playSound(gameoverSound);
+  /* Same spawn rate as original */
+  spawnTimer = setInterval(
+    spawnBalloon,
+    1100
+  );
 
-    container.classList.add('shake');
-    setTimeout(() => container.classList.remove('shake'), 1000);
+  spawnBalloon();
 
-    if (score > bestScore) {
-      bestScore = score;
-      localStorage.setItem('balloonBest', bestScore);
-      isNewBest = true;
+  lastTime = performance.now();
+
+  animationId =
+    requestAnimationFrame(gameLoop);
+}
+
+/* ---------------------------------------------------------
+   Spawn balloon
+   --------------------------------------------------------- */
+
+function spawnBalloon() {
+
+  if (gameOver || !gameStarted || gamePaused) {
+    return;
+  }
+
+  const image =
+    loadedBalloonImages[
+      Math.floor(
+        Math.random() *
+        loadedBalloonImages.length
+      )
+    ];
+
+  const size =
+    52 + Math.random() * 22;
+
+  const y =
+    40 +
+    Math.random() *
+    (GAME_HEIGHT * 0.32);
+
+  balloons.push({
+
+    image,
+
+    x: -70,
+
+    baseY: y,
+
+    y,
+
+    speed:
+      1.4 +
+      Math.random() * 2.6,
+
+    amplitude:
+      15 +
+      Math.random() * 15,
+
+    frequency:
+      0.03 +
+      Math.random() * 0.02,
+
+    size,
+
+    popped: false,
+
+    popTime: 0
+
+  });
+}
+
+/* ---------------------------------------------------------
+   Shoot
+   --------------------------------------------------------- */
+
+function shoot(e) {
+
+  if (!gameStarted || gameOver || gamePaused) {
+    return;
+  }
+
+  let clientX;
+  let clientY;
+
+  if (e.touches && e.touches.length) {
+
+    clientX =
+      e.touches[0].clientX;
+
+    clientY =
+      e.touches[0].clientY;
+
+  } else {
+
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+
+  const rect =
+    container.getBoundingClientRect();
+
+  const clickX =
+    clientX - rect.left;
+
+  const clickY =
+    clientY - rect.top;
+
+  const startX =
+    GAME_WIDTH / 2;
+
+  const startY =
+    GAME_HEIGHT - 60;
+
+  const dx =
+    clickX - startX;
+
+  const dy =
+    clickY - startY;
+
+  const dist =
+    Math.sqrt(dx * dx + dy * dy) || 1;
+
+  const speed = 13;
+
+  const vx =
+    (dx / dist) * speed;
+
+  const vy =
+    (dy / dist) * speed;
+
+  bullets.push({
+
+    x: startX,
+
+    y: startY,
+
+    vx,
+
+    vy,
+
+    hit: false
+
+  });
+}
+
+/* ---------------------------------------------------------
+   Draw balloon
+   --------------------------------------------------------- */
+
+function drawBalloon(b) {
+
+  if (!b.image.complete) {
+    return;
+  }
+
+  /* Original pop animation:
+     scale 1 -> 1.8
+     opacity 1 -> 0
+     over approximately 280ms */
+
+  if (b.popped) {
+
+    const progress =
+      Math.min(
+        b.popTime / 280,
+        1
+      );
+
+    const scale =
+      1 + progress * 0.8;
+
+    const opacity =
+      1 - progress;
+
+    ctx.save();
+
+    ctx.globalAlpha = opacity;
+
+    const drawSize =
+      b.size * scale;
+
+    ctx.drawImage(
+      b.image,
+      b.x +
+        (b.size - drawSize) / 2,
+      b.y +
+        (b.size - drawSize) / 2,
+      drawSize,
+      drawSize
+    );
+
+    ctx.restore();
+
+    return;
+  }
+
+  ctx.drawImage(
+    b.image,
+    b.x,
+    b.y,
+    b.size,
+    b.size
+  );
+}
+
+/* ---------------------------------------------------------
+   Draw bullet
+   --------------------------------------------------------- */
+
+function drawBullet(b) {
+
+  /* Similar visual appearance to the original
+     radial-gradient + glow, but cheaper than
+     DOM box-shadow rendering. */
+
+  const radius = 7;
+
+  const gradient =
+    ctx.createRadialGradient(
+      b.x,
+      b.y,
+      1,
+      b.x,
+      b.y,
+      radius
+    );
+
+  gradient.addColorStop(
+    0,
+    '#fff'
+  );
+
+  gradient.addColorStop(
+    0.35,
+    '#ffeb3b'
+  );
+
+  gradient.addColorStop(
+    1,
+    '#ff9800'
+  );
+
+  ctx.beginPath();
+
+  ctx.arc(
+    b.x,
+    b.y,
+    radius,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fillStyle = gradient;
+
+  ctx.fill();
+}
+
+/* ---------------------------------------------------------
+   Game loop
+   --------------------------------------------------------- */
+
+function gameLoop(timestamp) {
+
+  if (
+    gameOver ||
+    !gameStarted
+  ) {
+    animationId = null;
+    return;
+  }
+
+  /* Browser may produce a huge delta after
+     switching back to the game. */
+  let delta =
+    timestamp - lastTime;
+
+  lastTime = timestamp;
+
+  /* Prevent huge jumps */
+  if (delta > 50) {
+    delta = 50;
+  }
+
+  /*
+    Original movement was:
+      x += speed
+      every animation frame
+
+    We convert that to time-based movement.
+    At 60 FPS this is almost identical.
+  */
+
+  const frameMultiplier =
+    delta / 16.6667;
+
+  /* Clear canvas */
+  ctx.clearRect(
+    0,
+    0,
+    GAME_WIDTH,
+    GAME_HEIGHT
+  );
+
+  /* -------------------------------------------------------
+     BALLOONS
+     ------------------------------------------------------- */
+
+  for (
+    let i = balloons.length - 1;
+    i >= 0;
+    i--
+  ) {
+
+    const b = balloons[i];
+
+    /* Handle pop animation */
+    if (b.popped) {
+
+      b.popTime += delta;
+
+      if (b.popTime >= 280) {
+
+        balloons.splice(i, 1);
+
+        continue;
+      }
+
+      drawBalloon(b);
+
+      continue;
     }
 
-    const newBestHtml = isNewBest
+  /* Move horizontally */
+b.x += b.speed * frameMultiplier;
+
+/* Standard position: straight line when score < 50 */
+if (score < 50) {
+  b.y = b.baseY;
+} else {
+  /* Wave/shake effect activates only when score is 50 or higher */
+  b.y = b.baseY + Math.sin(b.x * b.frequency) * b.amplitude;
+}
+
+    /* Draw */
+    drawBalloon(b);
+
+    /* Balloon reached right side */
+    if (
+      b.x >
+      GAME_WIDTH + 20
+    ) {
+
+      endGame();
+
+      return;
+    }
+  }
+
+  /* -------------------------------------------------------
+     BULLETS
+     ------------------------------------------------------- */
+
+  for (
+    let i = bullets.length - 1;
+    i >= 0;
+    i--
+  ) {
+
+    const bullet = bullets[i];
+
+    if (bullet.hit) {
+      continue;
+    }
+
+    /* Move bullet */
+    bullet.x +=
+      bullet.vx *
+      frameMultiplier;
+
+    bullet.y +=
+      bullet.vy *
+      frameMultiplier;
+
+    let hitSomething = false;
+
+    /* -----------------------------------------------------
+       COLLISION DETECTION
+
+       Instead of Math.hypot(), compare squared distances.
+       This avoids an expensive square-root calculation
+       for every collision check.
+       ----------------------------------------------------- */
+
+    for (
+      let j = balloons.length - 1;
+      j >= 0;
+      j--
+    ) {
+
+      const b = balloons[j];
+
+      if (b.popped) {
+        continue;
+      }
+
+      const bx =
+        b.x +
+        b.size / 2;
+
+      const by =
+        b.y +
+        b.size / 2;
+
+      const dx =
+        bullet.x - bx;
+
+      const dy =
+        bullet.y - by;
+
+      const collisionRadius =
+        b.size / 2 + 10;
+
+      const distanceSquared =
+        dx * dx +
+        dy * dy;
+
+      if (
+        distanceSquared <
+        collisionRadius *
+        collisionRadius
+      ) {
+
+        /* Balloon enters pop animation */
+        b.popped = true;
+        b.popTime = 0;
+
+        hitSomething = true;
+
+        score++;
+
+        scoreEl.textContent =
+          'Score: ' + score;
+
+        playSound(
+          burstSound
+        );
+
+        /* Remove bullet */
+        bullets.splice(i, 1);
+
+        break;
+      }
+    }
+
+    if (hitSomething) {
+      continue;
+    }
+
+    /* Bullet outside game */
+    if (
+      bullet.x < -30 ||
+      bullet.x >
+        GAME_WIDTH + 30 ||
+      bullet.y < -30 ||
+      bullet.y >
+        GAME_HEIGHT + 30
+    ) {
+
+      bullets.splice(i, 1);
+
+      endGame();
+
+      return;
+    }
+
+    drawBullet(bullet);
+  }
+
+  animationId =
+    requestAnimationFrame(
+      gameLoop
+    );
+}
+
+/* ---------------------------------------------------------
+   End game
+   --------------------------------------------------------- */
+
+function endGame() {
+ gamePaused = true;
+ 
+  if (gameOver) {
+    return;
+  }
+
+  gameOver = true;
+  document.getElementById('bg').style.animationPlayState = 'paused';
+
+  if (spawnTimer !== null) {
+
+    clearInterval(
+      spawnTimer
+    );
+
+    spawnTimer = null;
+  }
+
+  if (animationId !== null) {
+
+    cancelAnimationFrame(
+      animationId
+    );
+
+    animationId = null;
+  }
+
+  playSound(
+    gameoverSound
+  );
+
+  container.classList.add(
+    'shake'
+  );
+
+  setTimeout(() => {
+
+    container.classList.remove(
+      'shake'
+    );
+
+  }, 1000);
+
+  /* Best score */
+  if (score > bestScore) {
+
+    bestScore = score;
+
+    localStorage.setItem(
+      'balloonBest',
+      bestScore
+    );
+
+    isNewBest = true;
+
+  } else {
+
+    isNewBest = false;
+  }
+
+  const newBestHtml =
+    isNewBest
       ? `<div class="new-best">★ NEW BEST! ★</div>`
       : '';
 
-    messageEl.innerHTML = `
-      <img src="images/red_ballon.png" alt="Red Balloon">
-      <div class="game-over-title">GAME OVER!</div>
-      <div class="game-over-info">${playerName}</div>
-      <div class="game-over-info">Score: ${score}</div>
-      <div class="game-over-info">Best: ${bestScore}</div>
-      ${newBestHtml}
-      <div class="btn-row">
-        <button class="game-btn" id="restart-btn">RESTART</button>
-        <button class="game-btn" id="share-btn">SHARE</button>
-      </div>
-    `;
-    messageEl.style.display = 'flex';
+  messageEl.innerHTML = `
+    <img
+      src="images/red_ballon.png"
+      alt="Red Balloon"
+    >
 
-    document.getElementById('restart-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      startGame();
-    });
+    <div class="game-over-title">
+      GAME OVER!
+    </div>
 
-    document.getElementById('share-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      shareStats();
-    });
-  }
+    <div class="game-over-info">
+      ${escapeHtml(playerName)}
+    </div>
 
-  async function shareStats() {
-    const text = `PopIt🎈\n` +
-                 `Player: ${playerName}\n` +
-                 `Score: ${score}\n` +
-                 `Best: ${bestScore}` +
-                 (isNewBest ? '\n★ NEW BEST! ★' : '');
+    <div class="game-over-info">
+      Score: ${score}
+    </div>
 
-    try {
-      const canvas = await html2canvas(messageEl, {
-        backgroundColor: '#f5e3b0',
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
+    <div class="game-over-info">
+      Best: ${bestScore}
+    </div>
 
-      canvas.toBlob(async (blob) => {
+    ${newBestHtml}
+
+    <div class="btn-row">
+
+      <button
+        class="game-btn"
+        id="restart-btn"
+      >
+        RESTART
+      </button>
+
+      <button
+        class="game-btn"
+        id="share-btn"
+      >
+        SHARE
+      </button>
+
+    </div>
+  `;
+
+  messageEl.style.display = 'flex';
+
+  document
+    .getElementById('restart-btn')
+    .addEventListener(
+      'click',
+      e => {
+
+        e.stopPropagation();
+
+        startGame();
+      }
+    );
+
+  document
+    .getElementById('share-btn')
+    .addEventListener(
+      'click',
+      e => {
+
+        e.stopPropagation();
+
+        shareStats();
+      }
+    );
+}
+
+/* ---------------------------------------------------------
+   Prevent player name from becoming HTML
+   --------------------------------------------------------- */
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/* ---------------------------------------------------------
+   Share stats
+   --------------------------------------------------------- */
+
+async function shareStats() {
+
+  const text =
+    `PopIt🎈\n` +
+    `Player: ${playerName}\n` +
+    `Score: ${score}\n` +
+    `Best: ${bestScore}` +
+    (
+      isNewBest
+        ? '\n★ NEW BEST! ★'
+        : ''
+    );
+
+  try {
+
+    const canvasImage =
+      await html2canvas(
+        messageEl,
+        {
+          backgroundColor:
+            '#f5e3b0',
+
+          scale: 2,
+
+          useCORS: true,
+
+          logging: false
+        }
+      );
+
+    canvasImage.toBlob(
+      async blob => {
+
         if (!blob) {
+
           fallbackShare(text);
+
           return;
         }
 
-        const file = new File([blob], 'balloon-score.png', { type: 'image/png' });
+        const file =
+          new File(
+            [blob],
+            'balloon-score.png',
+            {
+              type: 'image/png'
+            }
+          );
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'PopIt',
-            text: text
-          });
-        } else if (navigator.share) {
-          await navigator.share({ title: 'PopIt', text: text });
-          downloadImage(blob);
-        } else {
-          downloadImage(blob);
+        if (
+          navigator.canShare &&
+          navigator.canShare({
+            files: [file]
+          })
+        ) {
+
           try {
-            await navigator.clipboard.writeText(text);
-            alert('Screenshot downloaded & stats copied!');
+
+            await navigator.share({
+
+              files: [file],
+
+              title: 'PopIt',
+
+              text: text
+
+            });
+
+          } catch (error) {
+
+            /* User cancelled share */
+          }
+
+        } else if (
+          navigator.share
+        ) {
+
+          try {
+
+            await navigator.share({
+
+              title: 'PopIt',
+
+              text: text
+
+            });
+
+            downloadImage(blob);
+
+          } catch (error) {
+
+            /* User cancelled share */
+          }
+
+        } else {
+
+          downloadImage(blob);
+
+          try {
+
+            await navigator.clipboard
+              .writeText(text);
+
+            alert(
+              'Screenshot downloaded & stats copied!'
+            );
+
           } catch {
-            prompt('Copy your stats:', text);
+
+            prompt(
+              'Copy your stats:',
+              text
+            );
           }
         }
-      }, 'red_balloon.png');
-    } catch (err) {
-      console.error(err);
-      fallbackShare(text);
-    }
-  }
 
-  function downloadImage(blob) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'my_score.png';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+      },
+      'image/png'
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    fallbackShare(text);
+  }
+}
+
+/* ---------------------------------------------------------
+   Download image
+   --------------------------------------------------------- */
+
+function downloadImage(blob) {
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement('a');
+
+  a.href = url;
+
+  a.download =
+    'my_score.png';
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  document.body.removeChild(a);
+
+  /* Give browser a little time before
+     destroying the object URL */
+  setTimeout(() => {
+
     URL.revokeObjectURL(url);
-  }
 
-  function fallbackShare(text) {
-    if (navigator.share) {
-      navigator.share({ title: 'PopIt', text: text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Stats copied to clipboard!');
-      }).catch(() => {
-        prompt('Copy your stats:', text);
+  }, 1000);
+}
+
+/* ---------------------------------------------------------
+   Fallback sharing
+   --------------------------------------------------------- */
+
+function fallbackShare(text) {
+
+  if (navigator.share) {
+
+    navigator
+      .share({
+        title: 'PopIt',
+        text: text
+      })
+      .catch(() => {});
+
+  } else {
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+
+        alert(
+          'Stats copied to clipboard!'
+        );
+
+      })
+      .catch(() => {
+
+        prompt(
+          'Copy your stats:',
+          text
+        );
+
       });
-    }
   }
+}
 
-  // Event listeners
-  startBtn.addEventListener('click', function(e) {
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+/* Start button */
+startBtn.addEventListener(
+  'click',
+  function(e) {
+
     e.stopPropagation();
-    startGame();
-  });
 
-  startBtn.addEventListener('touchstart', function(e) {
+    startGame();
+  }
+);
+
+/* Mobile start */
+startBtn.addEventListener(
+  'touchstart',
+  function(e) {
+
     e.preventDefault();
+
     e.stopPropagation();
+
     startGame();
-  }, { passive: false });
 
-  nameInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') startGame();
-  });
+  },
+  { passive: false }
+);
 
-  container.addEventListener('click', shoot);
-  container.addEventListener('touchstart', function(e) {
-    if (e.target === startBtn || startScreen.contains(e.target) ||
-        e.target.closest('#message')) return;
+/* Enter key */
+nameInput.addEventListener(
+  'keydown',
+  e => {
+
+    if (e.key === 'Enter') {
+      startGame();
+    }
+
+  }
+);
+
+/* Desktop */
+container.addEventListener(
+  'click',
+  shoot
+);
+
+/* Mobile */
+container.addEventListener(
+  'touchstart',
+  function(e) {
+
+    if (
+      e.target === startBtn ||
+      startScreen.contains(e.target) ||
+      e.target.closest('#message')
+    ) {
+      return;
+    }
+
     e.preventDefault();
+
     shoot(e);
-  }, { passive: false });
 
-  window.addEventListener('resize', updateSize);
-  window.addEventListener('load', updateSize);
+  },
+  { passive: false }
+);
+
+/* Resize */
+window.addEventListener(
+  'resize',
+  updateSize
+);
+
+window.addEventListener(
+  'load',
+  updateSize
+);
+
+/* =========================================================
+   MOBILE / BATTERY OPTIMIZATION
+   ========================================================= */
+
+/*
+   When the player changes apps, locks the phone,
+   opens another browser tab, etc., completely stop
+   rendering.
+
+   The original game could continue consuming CPU
+   while hidden in some browser situations.
+*/
+document.addEventListener(
+  'visibilitychange',
+  () => {
+
+    if (
+      document.hidden &&
+      gameStarted &&
+      !gameOver
+    ) {
+
+      gamePaused = true;
+
+      if (animationId !== null) {
+
+        cancelAnimationFrame(
+          animationId
+        );
+
+        animationId = null;
+      }
+
+    } else if (
+      !document.hidden &&
+      gameStarted &&
+      !gameOver &&
+      gamePaused
+    ) {
+
+      gamePaused = false;
+
+      lastTime =
+        performance.now();
+
+      animationId =
+        requestAnimationFrame(
+          gameLoop
+        );
+    }
+
+  }
+);
+
+/*
+   Also handle browser window losing focus.
+*/
+window.addEventListener(
+  'blur',
+  () => {
+
+    if (
+      gameStarted &&
+      !gameOver
+    ) {
+
+      gamePaused = true;
+
+      if (animationId !== null) {
+
+        cancelAnimationFrame(
+          animationId
+        );
+
+        animationId = null;
+      }
+    }
+
+  }
+);
+
+window.addEventListener(
+  'focus',
+  () => {
+
+    if (
+      gameStarted &&
+      !gameOver &&
+      gamePaused &&
+      !document.hidden
+    ) {
+
+      gamePaused = false;
+
+      lastTime =
+        performance.now();
+
+      animationId =
+        requestAnimationFrame(
+          gameLoop
+        );
+    }
+
+  }
+);
+
+/* Initial size */
+updateSize();
+
+/* Restore player name */
+if (playerName) {
+  nameInput.value = playerName;
+}
+
 </script>
+
 </body>
 </html>
